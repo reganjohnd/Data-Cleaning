@@ -3,14 +3,17 @@ import re
 from datetime import datetime
 import logging
 
-if 'secret_dir' == 'secret_dir':
-    OUTPUT_DIR = 'G:\\My Drive\\DANIELS ECOSYSTEM\\extracurricularActivities\\DataScience\\datasets\\Transactional Retail Dataset of Electronics Store\\'
+OUTPUT_DIR = ''
 logging.basicConfig(level=logging.INFO, filename=f'{OUTPUT_DIR}info.log', format="%(asctime)s;%(levelname)s;%(message)s")
 logging.basicConfig(level=logging.WARNING, filename=f'{OUTPUT_DIR}warnings.log', format="%(asctime)s;%(levelname)s;%(message)s")
 
 def date_cleaning(data, correct_date_format):
     '''
-    correct date format: YYYY-mm-dd
+    correct date format: YYYY/mm/dd
+
+    @desc: format the dates of the @param data dataframe to be consistent and ready for further analysis
+    @param: data, dataframe which requires a "date" column containing dates for the transactions
+    @param: correct_date_format, correct format for the date
     '''
     bad_dates = data[~data['date'].str.contains(r'^\d{4}')]
     good_dates = data[data['date'].str.contains(r'^\d{4}')]
