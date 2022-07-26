@@ -2,10 +2,13 @@ import pandas as pd
 import re
 from datetime import datetime
 import logging
+import helper_functions as hf
 
-OUTPUT_DIR = ''
+OUTPUT_DIR = hf.create_dir('G:\My Drive\DANIELS ECOSYSTEM\extracurricularActivities\DataScience\datasets\Transactional Retail Dataset of Electronics Store', '')
 logging.basicConfig(level=logging.INFO, filename=f'{OUTPUT_DIR}info.log', format="%(asctime)s;%(levelname)s;%(message)s")
 logging.basicConfig(level=logging.WARNING, filename=f'{OUTPUT_DIR}warnings.log', format="%(asctime)s;%(levelname)s;%(message)s")
+
+df = pd.read_csv(hf.create_dir(OUTPUT_DIR, 'dirty_data.csv'))
 
 def date_cleaning(data, correct_date_format):
     '''
@@ -38,6 +41,8 @@ def date_cleaning(data, correct_date_format):
     output = pd.concat([bad_dates, good_dates])
     return output
 
-    
+# df = date_cleaning(df, '%Y/%m%d')
+# df['shopping_cart'] = df['shopping_cart'].apply(lambda x: eval(x))
+
 df = pd.read_csv(f'{OUTPUT_DIR}dirty_data_test.csv')
 date_cleaning(df, '%Y-%m-%d').to_csv(f'{OUTPUT_DIR}test_output.csv', index=False)
