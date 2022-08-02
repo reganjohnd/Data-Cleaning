@@ -8,7 +8,7 @@ OUTPUT_DIR = hf.create_dir('G:\My Drive\DANIELS ECOSYSTEM\extracurricularActivit
 logging.basicConfig(level=logging.INFO, filename=f'{OUTPUT_DIR}info.log', format="%(asctime)s;%(levelname)s;%(message)s")
 logging.basicConfig(level=logging.WARNING, filename=f'{OUTPUT_DIR}warnings.log', format="%(asctime)s;%(levelname)s;%(message)s")
 
-df = pd.read_csv(hf.create_dir(OUTPUT_DIR, 'dirty_data.csv'))
+# df = pd.read_csv(hf.create_dir(OUTPUT_DIR, 'dirty_data.csv'))
 
 def date_cleaning(data, correct_date_format):
     '''
@@ -42,8 +42,47 @@ def date_cleaning(data, correct_date_format):
     output = pd.concat([bad_dates, good_dates])
     return output
 
-# df = date_cleaning(df, '%Y/%m%d')
-# df['shopping_cart'] = df['shopping_cart'].apply(lambda x: eval(x))
+def product_sales_by_month(data):
+    # Analyse shopping cart
 
+    # isolate required fields
+    tmp_df = data[['order_id', 'customer_id', 'date', 'shopping_cart']]
+    # turn string into list variable
+    tmp_df['shopping_cart'] = [eval(x) for x in tmp_df['shopping_cart']]
+
+    # create new row for each item in list
+    df_stack = tmp_df.explode('shopping_cart').reset_index()
+
+    # extract quantity from tuple and place in separate column
+    df_stack['quantity'] = [x[1] for x in df_stack['shopping_cart']]
+
+    # extract product name from tuple
+    df_stack['shopping_cart'] = [x[0].upper() for x in df_stack['shopping_cart']]
+
+    # format dates
+    df_stack['date'] = [datetime.strptime(x.replace('-', '/'), '%Y/%m/%d') for x in df_stack['date']]
+    df_stack = df_stack.sort_values(by='date')
+
+    # reformat table
+    tmp = df_stack[['date', 'shopping_cart', 'quantity']]
+
+    # change date to a monthly time period
+    tmp['date'] = [x.to_period('M') for x in tmp['date']]
+
+    # aggregate data by month and product
+    tmp = tmp.groupby(['date', 'shopping_cart']).sum()
+    return tmp.reset_index()
+
+
+
+# read data in
 df = pd.read_csv(f'{OUTPUT_DIR}dirty_data_test.csv')
-date_cleaning(df, '%Y/%m/%d').to_csv(f'{OUTPUT_DIR}test_output.csv', index=False)
+
+# Cleaning: stage 1
+cleaned = date_cleaning(df, '%Y/%m/%d')
+
+# Formatting: Stage 1
+formatted = product_sales_by_month(cleaned)
+
+# exporting
+formatted.to_csv('C:\\Users\\regan\\OneDrive - 22Seven Digital\\1. Admin\\test.csv', index=False)
