@@ -73,6 +73,12 @@ def product_sales_by_month(data):
     tmp = tmp.groupby(['date', 'shopping_cart']).sum()
     return tmp.reset_index()
 
+def product_level_data(data):
+    data['shopping_cart'] = [eval(x) for x in data`['shopping_cart']]
+    data = data.explode('shopping_cart').reset_index()
+    data['quantity'] = [x[1] for x in data['shopping_cart']]
+    data['shopping_cart'] = [x[0].upper() for x in data['shopping_cart']]
+    return data
 
 
 # read data in
@@ -85,4 +91,4 @@ cleaned = date_cleaning(df, '%Y/%m/%d')
 formatted = product_sales_by_month(cleaned)
 
 # exporting
-formatted.to_csv('C:\\Users\\regan\\OneDrive - 22Seven Digital\\1. Admin\\test.csv', index=False)
+formatted.to_csv('G:\\My Drive\\DANIELS ECOSYSTEM\\extracurricularActivities\\DataScience\\datasets\\Transactional Retail Dataset of Electronics Store\\clean.csv', index=False)
