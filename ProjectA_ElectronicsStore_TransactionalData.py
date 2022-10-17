@@ -74,7 +74,7 @@ def product_sales_by_month(data):
     return tmp.reset_index()
 
 def product_level_data(data):
-    data['shopping_cart'] = [eval(x) for x in data`['shopping_cart']]
+    data['shopping_cart'] = [eval(x) for x in data['shopping_cart']]
     data = data.explode('shopping_cart').reset_index()
     data['quantity'] = [x[1] for x in data['shopping_cart']]
     data['shopping_cart'] = [x[0].upper() for x in data['shopping_cart']]
